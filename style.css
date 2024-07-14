@@ -9,3 +9,17 @@
 body {
   overflow: hidden;
 }
+
+.camera_info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.sample_description{
+  position: absolute;
+  text-align: center;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
