@@ -162,48 +162,50 @@ for (let j = 0; j < materials.length; j++) {
   }
 }
 
-// Sprite
-const make_canvasTexture = (() => {
-  // 貼り付けるcanvasを作成。
+// Text Box
+function text_box(text, size) {
   const canvasForText = document.createElement("canvas");
   const ctx = canvasForText.getContext("2d");
+  const canvasTexture_text = new THREE.CanvasTexture(canvasForText);
 
-  const canvasTexture = new THREE.CanvasTexture(canvasForText);
-  ctx.canvas.width = 1000; // 小さいと文字がぼやける
-  ctx.canvas.height = 500; // 小さいと文字がぼやける
+  const fontSize = 400;
+  ctx.font = `${fontSize}px serif`;
 
-  function update(text, fontSize) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // 透過率50%の青背景を描く
-    ctx.fillStyle = "rgba(0, 0, 255, 0.0)";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    //
-    ctx.fillStyle = "black";
-    ctx.font = `${fontSize}px serif`;
-    ctx.fillText(
-      text,
-      // x方向の余白/2をx方向開始時の始点とすることで、横方向の中央揃えをしている。
-      (ctx.canvas.width - ctx.measureText(text).width) / 2,
-      // y方向のcanvasの中央に文字の高さの半分を加えることで、縦方向の中央揃えをしている。
-      ctx.canvas.height / 2 + ctx.measureText(text).actualBoundingBoxAscent / 2
-    );
-    canvasTexture.needsUpdate = true;
-  }
+  ctx.canvas.width = ctx.measureText(text).width;
+  ctx.canvas.height = 500;
 
-  canvasTexture.update = update;
+  ctx.font = `${fontSize}px serif`;
 
-  return canvasTexture;
-})();
-const canvasTexture = make_canvasTexture;
-canvasTexture.update("Three.js Sample", 120);
-const material = new THREE.SpriteMaterial({
-  map: canvasTexture,
-  side: THREE.DoubleSide,
-});
-const sprite = new THREE.Sprite(material);
-sprite.scale.set(4, 2, 0);
-sprite.position.set(0, 5, 0);
-scene.add(sprite);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // 青背景を描く
+  ctx.fillStyle = "rgba(0, 0, 255, 0.0)";
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  // 文字を描く
+  ctx.fillStyle = "black";
+  ctx.fillText(
+    text,
+    (ctx.canvas.width - ctx.measureText(text).width) / 2,
+    ctx.canvas.height -
+      (ctx.canvas.height -
+        (ctx.measureText(text).fontBoundingBoxAscent -
+          ctx.measureText(text).fontBoundingBoxDescent)) /
+        2
+  );
+
+  const text_material = new THREE.SpriteMaterial({
+    map: canvasTexture_text,
+    side: THREE.DoubleSide,
+  });
+
+  const ratio = ctx.canvas.width / ctx.canvas.height;
+  const object = new THREE.Sprite(text_material);
+  object.scale.set(ratio * size, size, 0);
+  return object;
+}
+
+const text = text_box("Three.js Sample", 1);
+text.position.set(0, 5, 0);
+scene.add(text);
 
 // GUI
 const gui = new GUI();
