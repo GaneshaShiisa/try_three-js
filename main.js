@@ -163,37 +163,36 @@ for (let j = 0; j < materials.length; j++) {
 }
 
 // Text Box
-function text_box(text, size) {
-  const canvasForText = document.createElement("canvas");
-  const ctx = canvasForText.getContext("2d");
-  const canvasTexture_text = new THREE.CanvasTexture(canvasForText);
+function text_box(text, size = 1, color = "#000000", background = "#00000000") {
+  const canvas_for_text = document.createElement("canvas");
+  const ctx = canvas_for_text.getContext("2d");
+  const canvas_texture = new THREE.CanvasTexture(canvas_for_text);
 
-  const fontSize = 400;
+  const fontSize = 500;
+  ctx.font = `${fontSize}px serif`;
+  const width = ctx.measureText(text).width;
+  const height =
+    ctx.measureText(text).fontBoundingBoxAscent +
+    ctx.measureText(text).fontBoundingBoxDescent;
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
+
   ctx.font = `${fontSize}px serif`;
 
-  ctx.canvas.width = ctx.measureText(text).width;
-  ctx.canvas.height = 500;
-
-  ctx.font = `${fontSize}px serif`;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   // 青背景を描く
-  ctx.fillStyle = "rgba(0, 0, 255, 0.0)";
+  ctx.fillStyle = background; //rgb(0, 0, 255, 0.5)";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   // 文字を描く
-  ctx.fillStyle = "black";
+  ctx.fillStyle = color;
   ctx.fillText(
     text,
     (ctx.canvas.width - ctx.measureText(text).width) / 2,
-    ctx.canvas.height -
-      (ctx.canvas.height -
-        (ctx.measureText(text).fontBoundingBoxAscent -
-          ctx.measureText(text).fontBoundingBoxDescent)) /
-        2
+    ctx.measureText(text).fontBoundingBoxAscent
   );
 
   const text_material = new THREE.SpriteMaterial({
-    map: canvasTexture_text,
+    map: canvas_texture,
     side: THREE.DoubleSide,
   });
 
@@ -203,7 +202,7 @@ function text_box(text, size) {
   return object;
 }
 
-const text = text_box("Three.js Sample", 1);
+const text = text_box("Three.js Sample");
 text.position.set(0, 5, 0);
 scene.add(text);
 
