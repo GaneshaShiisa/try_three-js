@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import { ThreeMFLoader } from "three/examples/jsm/Addons.js";
+import Stats from "three/examples/jsm/libs/stats.module";
 
 const canvas = document.querySelector(".webgl");
 const camera_info = document.querySelector(".camera_info");
@@ -169,6 +170,7 @@ function text_box(text, size = 1, color = "#000000", background = "#00000000") {
   const canvas_texture = new THREE.CanvasTexture(canvas_for_text);
 
   const fontSize = 500;
+  // font: sans-serif, serif, cursive, fantasy, monospace
   ctx.font = `${fontSize}px serif`;
   const width = ctx.measureText(text).width;
   const height =
@@ -217,6 +219,12 @@ gui.addColor(color, "box").onChange(() => {
     }
   }
 });
+
+// フレームレートの数値を画面に表示
+const stats = new Stats();
+stats.domElement.style.position = "absolute";
+stats.domElement.style.top = "0px";
+document.body.appendChild(stats.domElement);
 
 // raycaster
 const raycaster = new THREE.Raycaster();
@@ -288,6 +296,8 @@ const animate = () => {
   renderer.render(scene, camera);
   window.requestAnimationFrame(animate);
 
+  // レンダリング情報を画面に表示
+  stats.update();
   //
   camera_info.innerHTML =
     "position = " +
@@ -302,7 +312,9 @@ const animate = () => {
     ", " +
     controls.target.y.toFixed(1) +
     ", " +
-    controls.target.z.toFixed(1);
+    controls.target.z.toFixed(1) +
+    "<br>" +
+    JSON.stringify(renderer.info.render, "", " ");
 };
 
 animate();
